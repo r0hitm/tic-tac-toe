@@ -88,7 +88,7 @@ button[type="button"]:active {
 
 .modal-box {
     width: 300px;
-    height: 140px;
+    height: 177px;
 
     text-align: center;
     color: var(--msg-font-color);
@@ -100,4 +100,18 @@ button[type="button"]:active {
 
 .modal-box>p {
     font-size: 24px;
+}
+
+/* buttons in the modal box */
+.btn-wrap {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+#sec1,
+#sec2 {
+    width: 125px;
+    height: 31px;
+    font-size: 20px;
 }
