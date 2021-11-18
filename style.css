@@ -1,0 +1,103 @@
+/*
+ * Tic Tac Toe game styles.
+ * Make the game look pretty!
+ *
+ * Author: Rohit Mehta (@r0hitm)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Lacquer&family=Lato&display=swap');
+
+:root {
+    --dark-purple: #4B4555;
+    --sweet-pink: #FFB4A2;
+    --light-purplish: #6D6875;
+    --msg-font-color: #A43D3D;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lacquer', cursive;
+}
+
+/* wraps header, .gameboard and footer */
+.wrapper {
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+header {
+    color: var(--dark-purple);
+}
+
+header>h1 {
+    font-size: 48px;
+}
+
+.gameboard {
+    width: 360px;
+    height: 360px;
+    background-color: var(--sweet-pink);
+}
+
+footer {
+    margin-top: 28px;
+}
+
+/* styles for all of the buttons in the game */
+button[type="button"] {
+    width: 150px;
+    height: 50px;
+    font-family: 'Lato', cursive;
+    font-size: 28px;
+    color: var(--sweet-pink);
+    background-color: var(--dark-purple);
+    border: 1px var(--dark-purple);
+    border-radius: 20px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+button[type="button"]:active {
+    background-color: var(--light-purplish);
+}
+
+/* modal boxes - */
+.modal-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(78, 78, 78, 0.26);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    visibility: hidden;
+    /* hidden by default */
+}
+
+.modal-box {
+    width: 300px;
+    height: 140px;
+
+    text-align: center;
+    color: var(--msg-font-color);
+
+    background: #FFFFFF;
+    border-radius: 13px;
+    box-shadow: 2px 2px 10px var(--dark-purple);
+}
+
+.modal-box>p {
+    font-size: 24px;
+}
