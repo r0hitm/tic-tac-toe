@@ -1,3 +1,5 @@
+<!-- Author: Rohit M (@r0hitm) -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,37 +13,23 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <header>
-            <h1>Tic Tac Toe</h1>
-        </header>
+    <h1>Tic Tac Toe</h1>
 
-        <div class="gameboard">
-            <!-- everything happens here -->
-            <!-- App.js is in total control here! -->
-        </div>
-
-        <footer>
-            <button id="primary" type="button">Start</button>
-        </footer>
+    <div class="gameboard">
+        <div data-i="1" class="cell"></div>
+        <div data-i="2" class="cell"></div>
+        <div data-i="3" class="cell"></div>
+        <div data-i="4" class="cell"></div>
+        <div data-i="5" class="cell"></div>
+        <div data-i="6" class="cell"></div>
+        <div data-i="7" class="cell"></div>
+        <div data-i="8" class="cell"></div>
+        <div data-i="9" class="cell"></div>
     </div>
 
-    <div class="modal-wrapper">
-        <div class="modal-box">
-            <header>
-                <h2>Game Over</h2>
-            </header>
-
-            <p class="msg-p">
-                <!-- App.js controlled-->
-            </p>
-
-            <div class="btn-wrap">
-                <button type="button" id="sec1">Restart</button>
-                <button type="button" id="sec2">View Board</button>
-            </div>
-        </div>
-    </div>
+    <footer>
+        <button type="button">Start</button>
+    </footer>
 </body>
 
 </html>
