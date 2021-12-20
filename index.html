@@ -17,6 +17,7 @@
     <h1>Tic Tac Toe</h1>
 
     <div class="gameboard">
+        <div data-i="0" class="cell"></div>
         <div data-i="1" class="cell"></div>
         <div data-i="2" class="cell"></div>
         <div data-i="3" class="cell"></div>
@@ -25,11 +26,10 @@
         <div data-i="6" class="cell"></div>
         <div data-i="7" class="cell"></div>
         <div data-i="8" class="cell"></div>
-        <div data-i="9" class="cell"></div>
     </div>
 
     <footer>
-        <button type="button">Start</button>
+        <button type="button" onclick="toggleGamestate();">(Re)Start</button>
     </footer>
 </body>
 
