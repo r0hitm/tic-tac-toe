@@ -42,10 +42,6 @@ const Gameboard = (() => {
     const cells = Array.from(document.querySelectorAll('div.cell'));
     const getCellValAt = (i) => cells[i].textContent;
 
-    for (let i = 0; i < 9; i++) {
-        console.log(i, cells[i].getAttribute('data-i'));  
-    }
-
     /**
      * 
      * @param {HTMLDivElement} cell - the gameboard cell
@@ -144,38 +140,37 @@ const Gameboard = (() => {
         }
     }
 
-    const initPlay = () => {
-        cells.forEach(el => el.addEventListener('click', function() {
-            // debug code
-            console.log('Cell ' + (parseInt(el.getAttribute('data-i')) + 1) + ' clicked.');
-            // ------
-    
-    
-            if (isCellEmpty(el)) {
-                total_move_count++;
-    
-                if (turn_of_x) {
-                    el.textContent = player_X;
-                    turn_of_x = false;
-                } else {
-                    el.textContent = player_O;
-                    turn_of_x = true;
-                }
-    
-                checkGameOver();
-                playing();
-            }
-        }));
-    }
+    cells.forEach(el => el.addEventListener('click', function() {
+        // debug code
+        console.log('Cell ' + (parseInt(el.getAttribute('data-i')) + 1) + ' clicked.');
+        // ------
 
-    return {initPlay, clear}
+
+        if (isCellEmpty(el)) {
+            total_move_count++;
+
+            if (turn_of_x) {
+                el.textContent = player_X;
+                turn_of_x = false;
+            } else {
+                el.textContent = player_O;
+                turn_of_x = true;
+            }
+
+            checkGameOver();
+        }
+    }));
+
+    return {clear}
 })();
 
 /**
  * Changes the game state between play and start
  */
-function toggleGamestate() {
-    console.log('Button clicked');
+
+const startBtn = document.querySelector('button.start');
+startBtn.addEventListener('click', el => {
+    console.log('button clicked');
 
     if (GameState.getGameState() === possibleGamestates.start || GameState.getGameState() === possibleGamestates.over) {
         GameState.setGameState(possibleGamestates.play);
@@ -184,16 +179,4 @@ function toggleGamestate() {
         GameState.setGameState(possibleGamestates.start);
         Gameboard.clear();
     }
-
-    playing();
-}
-
-
-/**
- * the function responds to the changes in the gamestate
- */
-const playing = () => {
-    if (GameState.getGameState() === possibleGamestates.play) {
-        Gameboard.initPlay();
-    }
-}
+});
