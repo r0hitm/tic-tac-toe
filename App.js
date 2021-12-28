@@ -5,27 +5,6 @@
  */
 
 
-const possibleGamestates = Object.freeze({'start': 0, 'play': 1, 'over': 2,});
-const GameState = (() => {
-    let cur_gamestate = possibleGamestates.start;
-
-    /**
-     * @returns {cur_gamestate}
-     */
-    const getGameState = () => cur_gamestate;
-
-    /**
-     * changes the current gamestate
-     * @param {availableGameStates}
-     * @returns {Boolean} returns true if successful
-     */
-    const setGameState = (g) => {
-        cur_gamestate = g;
-    }
-
-    return {getGameState, setGameState}
-})();
-
 /**
  * Gameboard Module
  * Handles all the gameboard operations, like placing pieces, checking for over conditions
@@ -35,148 +14,176 @@ const GameState = (() => {
  */
 
 const Gameboard = (() => {
-    const player_X = 'X';
-    const player_O = 'O';
-    let total_move_count = 0;   // the combined total of number of moves (X's and O's) played so far
-    let turn_of_x = true;   // is it X's turn? (X begins the match)
-    const cells = Array.from(document.querySelectorAll('div.cell'));
-    const getCellValAt = (i) => cells[i].textContent;
-
-    /**
-     * 
-     * @param {HTMLDivElement} cell - the gameboard cell
-     * @returns {Boolean} - true if cell's textContent is empty; otherwise false
-     */
-    const isCellEmpty = (cell) => {
-        if (cell.textContent === '')
-            return true;
-        else
-            return false;
-    }
+    const PLAYER_SYMBOLS = ['X', 'O'];
+    let turn_of_p1 = true; // player 1, ie PLAYERS[0] plays first, then followed by next player
+    let total_move_count = 0; // the combined total of number of moves (X's and O's) played so far
+    const cells = Array(9).fill('');
 
     /**
      * clear the game board
      */
-    const clear = () => {
-        cells.forEach(el => el.textContent = '');
-
+    const reset = () => {
+        turn_of_p1 = true;
+        total_move_count = 0;
+        cells.fill('');
     }
 
     /**
-     * Checks if all the given arguments are strictly equal.
-     * 
-     * @param {arguments}
-     * @returns {Boolean}
+     * Return the board cells data
      */
-    function areEqual(){
-        var len = arguments.length;
-        for (var i = 1; i< len; i++){
-           if (arguments[i] === '' || arguments[i] !== arguments[i-1])
-              return false;
-        }
-        return true;
-     }
+    const getBoard = () => cells;
 
     /**
-     * @returns {string} returns player_X or player_O whoever is won;
-     *                   if no legal move is left then returns 'Draw'
-     *                   if no one has won returns ''
-     */
-    const checkWinner = () => {
-        if (total_move_count <= 4) return '';
-
-        if (areEqual(getCellValAt(0), getCellValAt(1), getCellValAt(2)))
-            return getCellValAt(0);
-
-        else if (areEqual(getCellValAt(3), getCellValAt(4), getCellValAt(5)))
-            return getCellValAt(3);
-
-        else if (areEqual(getCellValAt(6), getCellValAt(7), getCellValAt(8)))
-            return getCellValAt(6);
-        
-        else if (areEqual(getCellValAt(0), getCellValAt(3), getCellValAt(6)))
-            return getCellValAt(0);
-
-        else if (areEqual(getCellValAt(1), getCellValAt(4), getCellValAt(7)))
-            return getCellValAt(1);
-
-        else if (areEqual(getCellValAt(2), getCellValAt(5), getCellValAt(8)))
-            return getCellValAt(2);
-
-        else if (areEqual(getCellValAt(0), getCellValAt(4), getCellValAt(8)))
-            return getCellValAt(0);
-
-        else if (areEqual(getCellValAt(2), getCellValAt(4), getCellValAt(6)))
-            return getCellValAt(2);
-        
-        else if (total_move_count === 9)
-            return 'Draw'
-
-        else
-            return '';
-    }
-
-    /**
+     * Interface to let players play the move on the board
      * 
-     * Game is over if any player wins or if there's a draw
-     * 
-     * @returns {Boolean} returns true if the game is over
+     * Return true when successful; false otherwise
      */
-    const checkGameOver = () => {
-        switch(checkWinner()) {
-            case player_X: 
-                console.log(player_X + " won!!!");
-                GameState.setGameState(possibleGamestates.over);
-                break;
-
-            case player_O:
-                console.log(player_O + " won!!!");
-                GameState.setGameState(possibleGamestates.over);
-                break;
-
-            case 'Draw':
-                console.log('It\'s a DRAW! No legal moves available')
-                GameState.setGameState(possibleGamestates.over);
-        }
-    }
-
-    cells.forEach(el => el.addEventListener('click', function() {
-        // debug code
-        console.log('Cell ' + (parseInt(el.getAttribute('data-i')) + 1) + ' clicked.');
-        // ------
-
-
-        if (isCellEmpty(el)) {
-            total_move_count++;
-
-            if (turn_of_x) {
-                el.textContent = player_X;
-                turn_of_x = false;
+    const nextMoveAt = (pos) => {
+        if (cells[pos] === '') {
+            if (turn_of_p1) {
+                cells[pos] = PLAYER_SYMBOLS[0];
+                turn_of_p1 = false;
             } else {
-                el.textContent = player_O;
-                turn_of_x = true;
+                cells[pos] = PLAYER_SYMBOLS[1];
+                turn_of_p1 = true;
             }
+            total_move_count++;
+            return true;
+        } else
+            return false;
+    }
 
-            checkGameOver();
-        }
-    }));
+    /**
+     * check for win
+     */
+    const checkWin = () => {
+        if (areEqual(cells[0], cells[1], cells[2]) ||
+            areEqual(cells[3], cells[4], cells[5]) ||
+            areEqual(cells[6], cells[7], cells[8]) ||
+            areEqual(cells[0], cells[3], cells[6]) ||
+            areEqual(cells[1], cells[4], cells[7]) ||
+            areEqual(cells[2], cells[5], cells[8]) ||
+            areEqual(cells[0], cells[4], cells[8]) ||
+            areEqual(cells[2], cells[4], cells[6])) {
+            return true;
+        } else
+            return false;
+    }
 
-    return {clear}
+    /**
+     * Returns true if the game is over.
+     * Either by win/loss or draw
+     */
+    const over = () => {
+        if (total_move_count > 4 && checkWin() || total_move_count === 9) {
+            return true;
+        } else
+            return false;
+    }
+
+    /**
+     * returns the current player symbol who'll play the next move
+     */
+    const getCurrentPlayerSymbol = () => PLAYER_SYMBOLS[turn_of_p1 ? 0 : 1];
+
+    /** returns the winner; '' if none */
+    // const getWinner = () => winner;
+
+    return {
+        reset,
+        getBoard,
+        nextMoveAt,
+        over,
+        getCurrentPlayerSymbol,
+        checkWin,
+    }
 })();
 
+const render = () => {
+    const grid = Array.from(document.querySelectorAll('div.cell'));
+    const cells = Gameboard.getBoard();
+    const turnSpan = document.querySelector('span.turn');
+
+    /**
+     * Renders the gameboard cells data from Gameboard to the screen
+     * 
+     */
+    for (let i = 0; i < cells.length; i++) {
+        grid[i].textContent = cells[i];
+    }
+
+    // shout out the player who has to play next
+    turnSpan.textContent = Gameboard.getCurrentPlayerSymbol();
+
+    // console.log('***** Debug: render() was called.'); // DEBUG CODE
+};
+
+// Render Gameboard on the screen
+const displayController = (() => {
+    // re-render the board
+    document.querySelector('div.gameboard').addEventListener('click', () => {
+
+        render();
+    });
+    // clear the board and re-render
+    document.querySelector('button.start').addEventListener('click', () => {
+        Gameboard.reset();
+        render();
+    });
+})();
+
+
 /**
- * Changes the game state between play and start
+ * Factory function for player.
  */
 
-const startBtn = document.querySelector('button.start');
-startBtn.addEventListener('click', el => {
-    console.log('button clicked');
+const playerFactory = () => {
+    const gridCells = Array.from(document.querySelectorAll('div.cell'));
 
-    if (GameState.getGameState() === possibleGamestates.start || GameState.getGameState() === possibleGamestates.over) {
-        GameState.setGameState(possibleGamestates.play);
+    const play = () => {
+        gridCells.forEach(el => el.addEventListener('click', () => {
+            const index = parseInt(el.getAttribute('data-i'));
+            Gameboard.nextMoveAt(index);
+
+            // check for game over condition
+            if (Gameboard.over()) {
+                const msg = 'Game Over! ';
+                setTimeout(() => {
+                    if (Gameboard.checkWin())
+                        alert(msg + 'Player ' + el.textContent + ' Won, yay!');
+                    else
+                        alert(msg + 'It\'s a Draw');
+                }, 1);
+            }
+        }));
     }
-    else if (GameState.getGameState() === possibleGamestates.play) {
-        GameState.setGameState(possibleGamestates.start);
-        Gameboard.clear();
+
+    return {
+        play,
     }
-});
+}
+
+const gameFlow = (() => {
+    const player = playerFactory();
+
+    player.play();
+
+})();
+
+
+
+//~~~~~~~~~~~~~~~~~~~ HELPER FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~
+/**
+ * Checks if all the given arguments are strictly equal.
+ * 
+ * @param {arguments}
+ * @returns {Boolean}
+ */
+function areEqual() {
+    var len = arguments.length;
+    for (var i = 1; i < len; i++) {
+        if (arguments[i] === '' || arguments[i] !== arguments[i - 1])
+            return false;
+    }
+    return true;
+}
