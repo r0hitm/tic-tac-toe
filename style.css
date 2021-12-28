@@ -8,10 +8,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Lacquer&family=Lato&display=swap');
 
 :root {
-    --dark-purple: #4B4555;
-    --board-color: #ffbca2;
-    --light-purplish: #6D6875;
+    --board-color: #A5A58D;
     --font-color: #A43D3D;
+    --bg-color: #FFF1E6;
+    --alt-bg-color: #DDBEA9;
+    --alt-color: #B7B7A4;
 }
 
 *,
@@ -24,7 +25,8 @@
 
 body {
     font-family: 'Lacquer', cursive;
-    color: var(--dark-purple);
+    color: var(--font-color);
+    background-color: var(--bg-color);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -34,7 +36,6 @@ body {
 }
 
 h1 {
-    color: var(--dark-purple);
     font-size: 3em;
 }
 
@@ -56,19 +57,24 @@ h1 {
     border: 1px solid black;
 }
 
+p {
+    font-family: 'Lato';
+    font-size: xx-large;
+}
+
 button {
     width: 150px;
     height: 50px;
-    font-family: 'Lato', cursive;
+    font-family: 'Lacquer', cursive;
     font-size: 28px;
-    color: var(--board-color);
-    background-color: var(--dark-purple);
-    border: 1px var(--dark-purple);
+    color: var(--font-color);
+    background-color: var(--alt-bg-color);
+    border: 1px var(--alt-bg-color);
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 button:active {
-    background-color: var(--light-purplish);
+    background-color: var(--alt-color);
     box-shadow: none;
 }
