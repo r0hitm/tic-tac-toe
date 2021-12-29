@@ -102,7 +102,7 @@ const Gameboard = (() => {
 const render = () => {
     const grid = Array.from(document.querySelectorAll('div.cell'));
     const cells = Gameboard.getBoard();
-    const turnSpan = document.querySelector('span.turn');
+    const feedbackHandle = document.querySelector('span.feedback');
 
     /**
      * Renders the gameboard cells data from Gameboard to the screen
@@ -113,7 +113,7 @@ const render = () => {
     }
 
     // shout out the player who has to play next
-    turnSpan.textContent = Gameboard.getCurrentPlayerSymbol();
+    feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
 
     // console.log('***** Debug: render() was called.'); // DEBUG CODE
 };
@@ -123,11 +123,6 @@ const displayController = (() => {
     // re-render the board
     document.querySelector('div.gameboard').addEventListener('click', () => {
 
-        render();
-    });
-    // clear the board and re-render
-    document.querySelector('button.start').addEventListener('click', () => {
-        Gameboard.reset();
         render();
     });
 })();
@@ -140,22 +135,35 @@ const displayController = (() => {
 const playerFactory = () => {
     const gridCells = Array.from(document.querySelectorAll('div.cell'));
 
-    const play = () => {
-        gridCells.forEach(el => el.addEventListener('click', () => {
-            const index = parseInt(el.getAttribute('data-i'));
-            Gameboard.nextMoveAt(index);
+    /**
+     * callback function to handle the player input from the click event
+     */
+    const playerInput = (evnt) => {
+        const el = evnt.currentTarget;
+        const index = parseInt(el.getAttribute('data-i'));
+        Gameboard.nextMoveAt(index);
 
-            // check for game over condition
-            if (Gameboard.over()) {
-                const msg = 'Game Over! ';
-                setTimeout(() => {
-                    if (Gameboard.checkWin())
-                        alert(msg + 'Player ' + el.textContent + ' Won, yay!');
-                    else
-                        alert(msg + 'It\'s a Draw');
-                }, 1);
-            }
-        }));
+        // check for game over condition
+        if (Gameboard.over()) {
+
+            // remove the above event listener now the game is over
+            gridCells.forEach(el => el.removeEventListener('click', playerInput));
+
+            const msg = 'Game Over! ';
+            setTimeout(() => {
+                if (Gameboard.checkWin())
+                    alert(msg + 'Player ' + el.textContent + ' Won, yay!');
+                else
+                    alert(msg + 'It\'s a Draw');
+            }, 1);
+        }
+    }
+
+    /**
+     * Let the players play by letting them place pieces on the Gameboard
+     */
+    const play = () => {
+        gridCells.forEach(el => el.addEventListener('click', playerInput));
     }
 
     return {
@@ -166,8 +174,17 @@ const playerFactory = () => {
 const gameFlow = (() => {
     const player = playerFactory();
 
-    player.play();
+    const startBtn = document.querySelector('button.start')
+    startBtn.addEventListener('click', evnt => {
+        // Update the button message, once
+        if (startBtn.textContent === 'Start') {
+            startBtn.textContent = 'Restart';
+        }
+        Gameboard.reset();
+        player.play();
 
+        render();
+    });
 })();
 
 
