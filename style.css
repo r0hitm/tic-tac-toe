@@ -30,9 +30,9 @@ body {
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
-    height: 90vh;
+    height: 100vh;
 }
 
 h1 {
@@ -59,7 +59,7 @@ h1 {
 
 p {
     font-family: 'Lato';
-    font-size: xx-large;
+    font-size: larger;
 }
 
 button {
