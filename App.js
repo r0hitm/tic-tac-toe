@@ -102,7 +102,6 @@ const Gameboard = (() => {
 const render = () => {
     const grid = Array.from(document.querySelectorAll('div.cell'));
     const cells = Gameboard.getBoard();
-    const feedbackHandle = document.querySelector('span.feedback');
 
     /**
      * Renders the gameboard cells data from Gameboard to the screen
@@ -112,19 +111,34 @@ const render = () => {
         grid[i].textContent = cells[i];
     }
 
-    // shout out the player who has to play next
-    feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
-
     // console.log('***** Debug: render() was called.'); // DEBUG CODE
 };
 
 // Render Gameboard on the screen
 const displayController = (() => {
-    // re-render the board
-    document.querySelector('div.gameboard').addEventListener('click', () => {
+    let startBtnPressed = false; // Keeps record whether Start btn was pressed
+    const board = document.querySelector('div.gameboard');
+    const feedbackHandle = document.querySelector('span.feedback');
 
+    // this interface allows for updating state
+    const btnPressed = () => {
+        startBtnPressed = true;
+
+        // This is to update the state change from the just btn press
+        feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
+    }
+
+    // re-render the board
+    board.addEventListener('click', () => {
         render();
+        // shout out the player who has to play next
+        if (startBtnPressed)
+            feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
     });
+
+    return {
+        btnPressed,
+    }
 })();
 
 
@@ -180,6 +194,7 @@ const gameFlow = (() => {
         if (startBtn.textContent === 'Start') {
             startBtn.textContent = 'Restart';
         }
+        displayController.btnPressed();
         Gameboard.reset();
         player.play();
 
