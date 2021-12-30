@@ -146,8 +146,10 @@ const displayController = (() => {
  * Factory function for player.
  */
 
-const playerFactory = () => {
+const playerFactory = (mode) => {
     const gridCells = Array.from(document.querySelectorAll('div.cell'));
+    const removeClick = () => gridCells.forEach(el => el.removeEventListener('click', playerInput));
+    const addClick = () => gridCells.forEach(el => el.addEventListener('click', playerInput));
 
     /**
      * callback function to handle the player input from the click event
@@ -157,11 +159,30 @@ const playerFactory = () => {
         const index = parseInt(el.getAttribute('data-i'));
         Gameboard.nextMoveAt(index);
 
+        if (!Gameboard.over() && mode === 'comp') {
+            removeClick();
+
+            /**
+             * Computer will play her turn randomly, not a very strategic play-style
+             */
+            setTimeout(() => {
+                let flag = false;
+                do {
+                    flag = Gameboard.nextMoveAt(Math.floor(Math.random() * 9));
+                } while (!flag);
+
+                render();   // udate the screen
+
+                // and let the user play his/her turn
+                addClick();
+            }, 1000);
+        }
+
         // check for game over condition
         if (Gameboard.over()) {
 
             // remove the above event listener now the game is over
-            gridCells.forEach(el => el.removeEventListener('click', playerInput));
+            removeClick();
 
             const msg = 'Game Over! ';
             setTimeout(() => {
@@ -176,17 +197,15 @@ const playerFactory = () => {
     /**
      * Let the players play by letting them place pieces on the Gameboard
      */
-    const play = () => {
-        gridCells.forEach(el => el.addEventListener('click', playerInput));
-    }
+    const play = () => addClick();
 
     return {
         play,
     }
 }
 
-const gameFlow = (() => {
-    const player = playerFactory();
+const init = (() => {
+    const player = playerFactory('comp');
 
     const startBtn = document.querySelector('button.start')
     startBtn.addEventListener('click', evnt => {
