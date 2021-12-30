@@ -15,7 +15,7 @@
 
 const Gameboard = (() => {
     const PLAYER_SYMBOLS = ['X', 'O'];
-    let turn_of_p1 = true; // player 1, ie PLAYERS[0] plays first, then followed by next player
+    let p1_turn = true; // player 1, ie PLAYERS[0] plays first, then followed by next player
     let total_move_count = 0; // the combined total of number of moves (X's and O's) played so far
     const cells = Array(9).fill('');
 
@@ -23,7 +23,7 @@ const Gameboard = (() => {
      * clear the game board
      */
     const reset = () => {
-        turn_of_p1 = true;
+        p1_turn = true;
         total_move_count = 0;
         cells.fill('');
     }
@@ -40,12 +40,12 @@ const Gameboard = (() => {
      */
     const nextMoveAt = (pos) => {
         if (cells[pos] === '') {
-            if (turn_of_p1) {
+            if (p1_turn) {
                 cells[pos] = PLAYER_SYMBOLS[0];
-                turn_of_p1 = false;
+                p1_turn = false;
             } else {
                 cells[pos] = PLAYER_SYMBOLS[1];
-                turn_of_p1 = true;
+                p1_turn = true;
             }
             total_move_count++;
             return true;
@@ -84,7 +84,12 @@ const Gameboard = (() => {
     /**
      * returns the current player symbol who'll play the next move
      */
-    const getCurrentPlayerSymbol = () => PLAYER_SYMBOLS[turn_of_p1 ? 0 : 1];
+    const getNextPlayerSymbol = () => PLAYER_SYMBOLS[p1_turn ? 0 : 1];
+
+    /**
+     * returns the last player symbol
+     */
+    const getLastPlayerMove = () => p1_turn ? PLAYER_SYMBOLS[1] : PLAYER_SYMBOLS[0];
 
     /** returns the winner; '' if none */
     // const getWinner = () => winner;
@@ -94,7 +99,8 @@ const Gameboard = (() => {
         getBoard,
         nextMoveAt,
         over,
-        getCurrentPlayerSymbol,
+        getNextPlayerSymbol,
+        getLastPlayerMove,
         checkWin,
     }
 })();
@@ -120,12 +126,17 @@ const displayController = (() => {
     const board = document.querySelector('div.gameboard');
     const feedbackHandle = document.querySelector('span.feedback');
 
+    const updateFeedback = () => {
+        // console.log('Current player symbol: ' + Gameboard.getNextPlayerSymbol());
+        feedbackHandle.textContent = Gameboard.getNextPlayerSymbol();
+    }
+
     // this interface allows for updating state
     const btnPressed = () => {
         startBtnPressed = true;
-
+        // console.log('ONCE only!!!!'); // DEBUG CODE
         // This is to update the state change from the just btn press
-        feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
+        updateFeedback();
     }
 
     // re-render the board
@@ -133,11 +144,12 @@ const displayController = (() => {
         render();
         // shout out the player who has to play next
         if (startBtnPressed)
-            feedbackHandle.textContent = Gameboard.getCurrentPlayerSymbol();
+            updateFeedback();
     });
 
     return {
         btnPressed,
+        updateFeedback,
     }
 })();
 
@@ -148,56 +160,73 @@ const displayController = (() => {
 
 const playerFactory = (mode) => {
     const gridCells = Array.from(document.querySelectorAll('div.cell'));
-    const removeClick = () => gridCells.forEach(el => el.removeEventListener('click', playerInput));
-    const addClick = () => gridCells.forEach(el => el.addEventListener('click', playerInput));
+    const checkEndGame = (winner) => {
+        render(); // update screen, before proceeding further
+
+        // console.log('WInner is ' + winner); // DEBUG CODE
+
+        if (Gameboard.over()) {
+            // remove the above event listener now the game is over
+            gridCells.forEach(el => el.removeEventListener('click', playerInput));
+
+            const msg = 'Game Over! ';
+            console.log(msg); // DEBUG CODE
+
+            if (Gameboard.checkWin())
+                alert(msg + 'Player ' + winner + ' Won, yay!');
+            else
+                alert(msg + 'It\'s a Draw');
+
+        }
+    }
 
     /**
      * callback function to handle the player input from the click event
      */
     const playerInput = (evnt) => {
         const el = evnt.currentTarget;
+        // console.log(el); // DEBUG CODE
+
+        // Player moves
         const index = parseInt(el.getAttribute('data-i'));
-        Gameboard.nextMoveAt(index);
+        if (!Gameboard.nextMoveAt(index))
+            return; // return if player is trying to play illegal move
+
+        checkEndGame(Gameboard.getLastPlayerMove()); // Has player won?
 
         if (!Gameboard.over() && mode === 'comp') {
-            removeClick();
+            // don't let player play, until comp has played
+            gridCells.forEach(el => el.removeEventListener('click', playerInput));
 
             /**
              * Computer will play her turn randomly, not a very strategic play-style
              */
             setTimeout(() => {
                 let flag = false;
-                do {
-                    flag = Gameboard.nextMoveAt(Math.floor(Math.random() * 9));
-                } while (!flag);
+                let compMove = Math.floor(Math.random() * 9);
 
-                render();   // udate the screen
+                while (!flag) {
+                    compMove = Math.floor(Math.random() * 9);
+                    flag = Gameboard.nextMoveAt(compMove);
+                    checkEndGame(Gameboard.getLastPlayerMove()); // Has comp won?
+                    // console.log('just after computer move, player symbol is ' + Gameboard.getNextPlayerSymbol());
+                }
 
-                // and let the user play his/her turn
-                addClick();
+                // update screen output after computer move
+                render();
+                displayController.updateFeedback();
+                // player can play hi/her turn now
+                gridCells.forEach(el => el.addEventListener('click', playerInput));
             }, 1000);
-        }
-
-        // check for game over condition
-        if (Gameboard.over()) {
-
-            // remove the above event listener now the game is over
-            removeClick();
-
-            const msg = 'Game Over! ';
-            setTimeout(() => {
-                if (Gameboard.checkWin())
-                    alert(msg + 'Player ' + el.textContent + ' Won, yay!');
-                else
-                    alert(msg + 'It\'s a Draw');
-            }, 1);
         }
     }
 
     /**
      * Let the players play by letting them place pieces on the Gameboard
      */
-    const play = () => addClick();
+    const play = () => {
+        gridCells.forEach(el => el.addEventListener('click', playerInput));
+    }
 
     return {
         play,
