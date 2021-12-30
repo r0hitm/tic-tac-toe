@@ -7,4 +7,14 @@ in a fierce match of Tic Tac Toe.
 
 This Project is inspired from the [The Odin Project](https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript/lessons/tic-tac-toe) curriculum.
 
+## Things I learned
+
+- Abstractions using Module Pattern and Factory functions
+- Event driven approach to game loop (this took me sometime to figure out! But I'm proud of it now, yay 🎉)
+
+## Some things to do later on
+
+- Refactor
+- Replacing the randomly playing computer with an unbeatable AI
+
 Author: [Rohit M](https://github.com/r0hitm)
