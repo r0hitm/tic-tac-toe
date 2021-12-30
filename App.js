@@ -228,25 +228,55 @@ const playerFactory = (mode) => {
         gridCells.forEach(el => el.addEventListener('click', playerInput));
     }
 
+    /**
+     * removes the playerInput from the gridCells
+     */
+    const reset = () => {
+        gridCells.forEach(el => el.removeEventListener('click', playerInput));
+    }
+
     return {
         play,
+        reset
     }
 }
 
 const init = (() => {
-    const player = playerFactory('comp');
+    let player;
 
-    const startBtn = document.querySelector('button.start')
-    startBtn.addEventListener('click', evnt => {
-        // Update the button message, once
-        if (startBtn.textContent === 'Start') {
-            startBtn.textContent = 'Restart';
+    const playAgainstCompBtn = document.querySelector('button.start-comp');
+    const playLocalBtn = document.querySelector('button.start-local');
+
+    const hardReset = () => {
+        if (player instanceof Object) { // remove all previously set eventListeners
+            player.reset();
         }
+
+        // THe order of below calls matter!
         displayController.btnPressed();
         Gameboard.reset();
+        displayController.updateFeedback();
+        render();
+    }
+
+    playAgainstCompBtn.addEventListener('click', () => {
+        hardReset();
+
+        player = playerFactory('comp');     // playing against computer
         player.play();
 
-        render();
+        playAgainstCompBtn.textContent = 'Restart';
+        playLocalBtn.textContent = 'Pass & Play against Friends';
+    });
+
+    playLocalBtn.addEventListener('click', () => {
+        hardReset();
+
+        player = playerFactory();   // playing locally against friends
+        player.play();
+
+        playAgainstCompBtn.textContent = 'Play against Computer';
+        playLocalBtn.textContent = 'Restart';
     });
 })();
 
